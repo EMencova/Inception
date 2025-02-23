@@ -12,7 +12,7 @@ volumes:
     driver-opts:
       type: none
       o: bind
-      device: /home/...........
+      device: /home/emencova/data/wordpress
 
   mariadb:
     driver: local
@@ -20,43 +20,46 @@ volumes:
     driver-opts:
       type: none
       o: bind
-      device: /home/......
+      device: /home/emencova/mariadb
 
 services:
   maria_db:
     container_name: maria_db
-    build: ./whatever folder its in 
+    build: ./mariadb/.
     env-file:
       - .env
     volumes:
-      - mariadb: /wherever it is
+      - mariadb: /var/lib/mysql
     networks:
       my-network
     restart:
       unless-stopped
 
-services:
   word_press:
     container_name: word_press
-    build: ./whatever folder its in 
+    build: ./wordpress/.
     env-file:
       - .env
     volumes:
-      - mariadb: /wherever it is
+      - wordpress: /var/www/html
     networks:
       my-network
     restart:
       unless-stopped
 
 
-Nginx:
-  container_name: Nginx
-  build: ./wherever it is in
-  ports:
-    -"443:443"
-  depends_on:
-    -word_press
-  volumes:
-    - wordpress: /var/www/html
+  Nginx:
+    container_name: Nginx
+    build: ./ngintx/.
+    ports:
+      -"443:443"
+    depends_on:
+      -word_press
+    volumes:
+      - wordpress: /var/www/html
+    networks:
+      - my-network
+    restart:
+      unless-stopped
 
 
