@@ -8,5 +8,7 @@ re:
 	@docker-compose -f ./src/docker-compose.yml up --build
 
 clean:
-	@docker-compose down --volumes --rmi all --remove-orphans
+	@docker-compose -f ./src/docker-compose.yml down --volumes --rmi all --remove-orphans
+	@docker system prune -f
+
 

@@ -1,65 +1,50 @@
-version: "3,5"
+
+# sudo usermod -aG docker $(whoami) //add user to not have to use sudo
+# newgrp docker // to apply changes
+
+
+
+#  http://localhost:8080/wp-admin/  //to login to wp website
+# sudo systemctl restart docker
+# sudo systemctl stop docker
+# sudo systemctl start docker
+
+
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  wordpress:
+    image: wordpress:latest
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: user
+      WORDPRESS_DB_PASSWORD: password
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
+    networks:
+      - app-network
 
 networks:
-  my-network:
-    name: my-network
+  app-network:
     driver: bridge
 
 volumes:
-  wordpress:
+  mariadb_data:
     driver: local
-    name: wordpress
-    driver-opts:
-      type: none
-      o: bind
-      device: /home/emencova/data/wordpress
-
-  mariadb:
-    driver: local
-    name: mariadb
-    driver-opts:
-      type: none
-      o: bind
-      device: /home/emencova/mariadb
-
-services:
-  maria_db:
-    container_name: maria_db
-    build: ./mariadb/.
-    env-file:
-      - .env
-    volumes:
-      - mariadb: /var/lib/mysql
-    networks:
-      my-network
-    restart:
-      unless-stopped
-
-  word_press:
-    container_name: word_press
-    build: ./wordpress/.
-    env-file:
-      - .env
-    volumes:
-      - wordpress: /var/www/html
-    networks:
-      my-network
-    restart:
-      unless-stopped
-
-
-  Nginx:
-    container_name: Nginx
-    build: ./ngintx/.
-    ports:
-      -"443:443"
-    depends_on:
-      -word_press
-    volumes:
-      - wordpress: /var/www/html
-    networks:
-      - my-network
-    restart:
-      unless-stopped
 
 

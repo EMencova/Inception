@@ -1,13 +1,14 @@
 FROM debian:buster
 
-RUN apt-get update
-RUN apt-get install -y mariadb-server
+RUN apt-get update && apt-get install -y mariadb-server
 
+# Expose port 3306 for MySQL
 EXPOSE 3306
 
-COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/
-COPY ./tools /var/www/
+# Start MariaDB service and run SQL commands for initial setup
+COPY ./tools/init_db.sql /var/www/
 
-RUN service mysql start && mysql < /var/www/initial_db.sql && rm -f /var/www/initial_db.sql;
+RUN service mysql start && mysql < /var/www/init_db.sql && rm -f /var/www/init_db.sql
 
 CMD ["mysqld"]
+
