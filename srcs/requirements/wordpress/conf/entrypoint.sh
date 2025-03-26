@@ -7,7 +7,7 @@ echo "DB_USER: $DB_USER"
 echo "DB_PASS: $DB_PASS"
 echo "DB_ROOT: $DB_ROOT"
 
-# Check if WordPress core files are missing
+# Check if files are missing
 if [ ! -f "/var/www/wp-settings.php" ]; then
   echo "WordPress files not found. Downloading..."
   wget https://wordpress.org/latest.tar.gz -P /tmp
@@ -18,14 +18,14 @@ if [ ! -f "/var/www/wp-settings.php" ]; then
   echo "WordPress downloaded to /var/www/"
 fi
 
-# Generate wp-config.php if missing
+# if missing
 if [ ! -s "/var/www/wp-config.php" ]; then
   echo "Generating wp-config.php..."
   sh /scripts/wp-config-create.sh
   echo "wp-config.php generated."
 fi
 
-# Set permissions for Apache/Nginx (adjust user/group as needed)
+# Set permissions 
 chown -R nobody:nobody /var/www
 chmod -R 755 /var/www
 

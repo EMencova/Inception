@@ -5,7 +5,7 @@ ARG DB_NAME
 ARG DB_USER
 ARG DB_PASS
 
-# Promote build-time variables to runtime environment variables:
+
 ENV DB_NAME=${DB_NAME}
 ENV DB_USER=${DB_USER}
 ENV DB_PASS=${DB_PASS}
@@ -32,16 +32,15 @@ RUN apk update && apk upgrade && apk add --no-cache \
     sed -i "s|;listen.group = nobody|listen.group = nobody|g" /etc/php82/php-fpm.d/www.conf && \
     rm -f /var/cache/apk/*
 
-# Create a directory for scripts
+
 RUN mkdir -p /scripts
 
-# Copy the configuration script to /scripts (not /var/www)
+
 COPY ./requirements/wordpress/conf/wp-config-create.sh /scripts/
 RUN chmod +x /scripts/wp-config-create.sh
 
 WORKDIR /var/www
 
-# Copy entrypoint script
 COPY ./requirements/wordpress/conf/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

@@ -1,85 +1,52 @@
-version: '3.8'
+version: '3.7'
 
 services:
-  nginx:
-    image: nginx
-    build:
-      context: .
-      dockerfile: requirements/nginx/Dockerfile
-    container_name: nginx
-    depends_on:
-      - wordpress
-    ports:
-      - "443:443"
-    networks:
-      - inception
-    volumes:
-      - ./requirements/nginx/conf/:/etc/nginx/http.d/
-      - ./requirements/nginx/tools:/etc/nginx/ssl/
-      - wp-volume:/var/www/
-    restart: always
-
   mariadb:
-    image: mariadb
-    build:
-      context: .
-      dockerfile: requirements/mariadb/Dockerfile
-      args:
-        DB_NAME: ${DB_NAME}
-        DB_USER: ${DB_USER}
-        DB_PASS: ${DB_PASS}
-        DB_ROOT: ${DB_ROOT}
+    image: mariadb:latest
+    restart: always
     environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      DB_ROOT: ${DB_ROOT}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
     container_name: mariadb
     ports:
       - "3306:3306"
-    networks:
-      - inception
     volumes:
-      - db-volume:/var/lib/mysql
-    restart: always
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - wordpress_network
 
   wordpress:
-    image: wordpress
-    build:
-      context: .
-      dockerfile: requirements/wordpress/Dockerfile
-      args:
-        DB_NAME: ${DB_NAME}
-        DB_USER: ${DB_USER}
-        DB_PASS: ${DB_PASS}
-        DB_ROOT: ${DB_ROOT}
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      DB_ROOT: ${DB_ROOT}
-    container_name: wordpress
+    image: wordpress:latest
+    restart: always
     depends_on:
       - mariadb
-    networks:
-      - inception
+    environment:
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASS}
+      WORDPRESS_DB_HOST: mariadb
+    container_name: wordpress
+    ports:
+      - "8080:80"
     volumes:
-      - wp-volume:/var/www/
-    restart: always
-    
-volumes:
-  wp-volume:
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/wordpress
-
-  db-volume:
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/mariadb
+      - wordpress_data:/var/www/html
+      - wordpress_sessions:/var/www/html/wp-content/uploads 
+    networks:
+      - wordpress_network
 
 networks:
-  inception:
+  wordpress_network:
     driver: bridge
+
+volumes:
+  mariadb_data:
+  wordpress_data:
+  wordpress_sessions:
+
+
+
+
+
+
