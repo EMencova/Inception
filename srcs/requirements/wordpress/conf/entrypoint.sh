@@ -26,7 +26,8 @@ if [ ! -s "/var/www/wp-config.php" ]; then
 fi
 
 # Set permissions 
-chown -R nobody:nobody /var/www
+chown -R chown -R www-data:www-data /var/www
+
 chmod -R 755 /var/www
 
 exec "$@"
